@@ -1,2 +1,2 @@
-# blue market 
+# blue market
 Online marketing 
