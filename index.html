@@ -1,2 +1,693 @@
-<h1>Welcome to Lion Gate Online Marketing</h1>
-<p>Grow your business with our tools, services, and strategies.</p>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>BlueMarket — Demo (All-in-One)</title>
+<style>
+  /* ========== THEME ========== */
+  :root{
+    --yellow:#FFD43B;
+    --blue:#0A5FFF;
+    --dark:#0b1220;
+    --muted:#6b7280;
+    --bg:#f7f9fc;
+    --card:#ffffff;
+    --danger:#ff5252;
+  }
+  *{box-sizing:border-box}
+  body{
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    margin:0;background:var(--bg);color:var(--dark);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{
+    max-width:1100px;margin:20px auto;padding:16px;
+  }
+
+  /* header */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin-bottom:16px;
+  }
+  .brand{
+    display:flex;align-items:center;gap:10px;
+  }
+  .logo{
+    width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,var(--yellow),var(--blue));
+    display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;
+    box-shadow:0 6px 18px rgba(10,95,255,0.12);
+  }
+  h1{margin:0;font-size:20px}
+  .nav{display:flex;gap:8px;align-items:center}
+  .btn{
+    background:var(--blue);color:#fff;border:0;padding:8px 12px;border-radius:8px;cursor:pointer;
+    box-shadow:0 6px 12px rgba(10,95,255,0.08);
+  }
+  .btn.secondary{background:transparent;color:var(--blue);border:1px solid rgba(10,95,255,0.12)}
+  .search{
+    display:flex;gap:8px;align-items:center;background:#fff;border-radius:10px;padding:6px 8px;border:1px solid #e6eefb;
+  }
+  input[type="search"]{border:0;outline:0;font-size:14px;background:transparent;width:220px}
+
+  /* layout */
+  .grid{display:grid;grid-template-columns:1fr 320px;gap:16px}
+  .card{background:var(--card);padding:14px;border-radius:12px;box-shadow:0 6px 18px rgba(15,23,42,0.04)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+
+  /* product */
+  .product{border-radius:10px;overflow:hidden;border:1px solid #eef6ff;background:#fff;display:flex;flex-direction:column}
+  .product img{width:100%;height:160px;object-fit:cover;background:#f2f6ff}
+  .product .body{padding:10px;flex:1;display:flex;flex-direction:column;gap:8px}
+  .price{font-weight:700;color:var(--blue)}
+  .small{font-size:13px;color:var(--muted)}
+
+  /* forms */
+  form{display:flex;flex-direction:column;gap:8px}
+  input,textarea,select{padding:8px;border-radius:8px;border:1px solid #e6eefb;background:#fff}
+  label{font-size:13px;color:var(--muted)}
+  .row{display:flex;gap:8px}
+  .row .col{flex:1}
+
+  /* navtabs */
+  .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .tab{padding:8px 10px;border-radius:10px;background:transparent;border:1px solid transparent;cursor:pointer}
+  .tab.active{background:linear-gradient(90deg,var(--yellow),#ffc74f);color:var(--dark);font-weight:600}
+
+  /* footer */
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* responsive */
+  @media(max-width:880px){
+    .grid{grid-template-columns:1fr; }
+    input[type="search"]{width:120px}
+  }
+
+  /* dark mode (toggle) */
+  body.dark{
+    background:#0f1724;color:#dbeafe;
+  }
+  body.dark .card{background:#0b1220;color:#e6f0ff;border:1px solid rgba(255,255,255,0.04)}
+  body.dark .product{background:#071025;border:1px solid rgba(255,255,255,0.03)}
+  body.dark input,body.dark textarea{background:#0b1220;color:#cfe6ff;border:1px solid rgba(255,255,255,0.04)}
+  .muted-dark{color:#98a8c9}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header>
+    <div class="brand">
+      <div class="logo">BM</div>
+      <div>
+        <h1>BlueMarket</h1>
+        <div class="small">Buy & Sell — Demo</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="search card" style="padding:6px 10px;">
+        <input id="globalSearch" type="search" placeholder="Search items, e.g., phones" />
+        <button class="btn secondary" onclick="searchItems()">Search</button>
+      </div>
+
+      <div id="authArea"></div>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section>
+      <div class="tabs" id="mainTabs">
+        <button class="tab active" data-tab="home" onclick="showTab('home')">Home</button>
+        <button class="tab" data-tab="create" onclick="showTab('create')">Create Account</button>
+        <button class="tab" data-tab="add-item" onclick="showTab('add-item')">Add Item</button>
+        <button class="tab" data-tab="profile" onclick="showTab('profile')">Profile</button>
+        <button class="tab" data-tab="settings" onclick="showTab('settings')">Settings</button>
+      </div>
+
+      <!-- ========== HOME ========== -->
+      <div id="home" class="card view">
+        <h2>Featured</h2>
+        <div id="productList" class="cards" style="margin-top:10px;"></div>
+      </div>
+
+      <!-- ========== CREATE ACCOUNT ========== -->
+      <div id="create" class="card view" style="display:none;">
+        <h2>Create Account</h2>
+        <form id="signupForm">
+          <label>Full name *</label>
+          <input id="su_name" required placeholder="Your full name" />
+          <label>Email *</label>
+          <input id="su_email" type="email" required placeholder="email@example.com" />
+          <label>Phone (WhatsApp)</label>
+          <input id="su_phone" placeholder="024xxxxxxx" />
+          <label>ID / Passport (for verification)</label>
+          <input id="su_id" placeholder="Optional: ID number" />
+          <label>Password *</label>
+          <input id="su_pass" type="password" required placeholder="Create password" />
+          <label>Confirm Password *</label>
+          <input id="su_pass2" type="password" required placeholder="Confirm password" />
+          <label>Short bio</label>
+          <textarea id="su_bio" rows="3" placeholder="Tell buyers about you"></textarea>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn" type="button" onclick="doSignUp()">Create Account</button>
+            <button class="btn secondary" type="button" onclick="showTab('home')">Cancel</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ========== ADD ITEM ========== -->
+      <div id="add-item" class="card view" style="display:none;">
+        <h2>Add New Item</h2>
+        <form id="addItemForm">
+          <label>Title *</label>
+          <input id="item_title" required placeholder="Product title, e.g., Wireless Headphones" />
+          <label>Price (GHS) *</label>
+          <input id="item_price" required type="number" min="0" placeholder="59.99" />
+          <label>Category</label>
+          <select id="item_category">
+            <option>Electronics</option>
+            <option>Fashion</option>
+            <option>Home</option>
+            <option>Automobile</option>
+            <option>Real Estate</option>
+            <option>Other</option>
+          </select>
+          <label>Image (optional)</label>
+          <input id="item_image" type="file" accept="image/*" />
+          <label>Description</label>
+          <textarea id="item_desc" rows="4" placeholder="Describe the item"></textarea>
+
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn" type="button" onclick="addItem()">Add Item</button>
+            <button class="btn secondary" type="button" onclick="clearAddItemForm()">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- ========== PROFILE ========== -->
+      <div id="profile" class="card view" style="display:none;">
+        <h2>Your Profile</h2>
+        <div id="profileArea"></div>
+      </div>
+
+      <!-- ========== SETTINGS ========== -->
+      <div id="settings" class="card view" style="display:none;">
+        <h2>Settings</h2>
+        <form id="settingsForm">
+          <label>Change PIN (4 digits)</label>
+          <input id="pin" maxlength="4" placeholder="1234" />
+          <div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+            <input id="darkToggle" type="checkbox" />
+            <label for="darkToggle">Enable Dark Mode</label>
+          </div>
+          <div style="margin-top:12px;">
+            <button class="btn" type="button" onclick="saveSettings()">Save Settings</button>
+          </div>
+        </form>
+      </div>
+
+    </section>
+
+    <!-- SIDEBAR -->
+    <aside>
+      <div class="card" style="margin-bottom:12px;">
+        <h3>Quick Actions</h3>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px;">
+          <button class="btn" onclick="showTab('add-item')">Add Item</button>
+          <button class="btn secondary" onclick="showTab('create')">Create Account</button>
+          <button class="btn secondary" onclick="showLoginModal()">Sign In</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Top Categories</h4>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;">
+          <button class="tab small-cat" onclick="filterCategory('All')">All</button>
+          <button class="tab small-cat" onclick="filterCategory('Electronics')">Electronics</button>
+          <button class="tab small-cat" onclick="filterCategory('Fashion')">Fashion</button>
+          <button class="tab small-cat" onclick="filterCategory('Home')">Home</button>
+          <button class="tab small-cat" onclick="filterCategory('Automobile')">Cars</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:12px;">
+        <h4>About BlueMarket</h4>
+        <div class="small">Demo marketplace created for selling templates & scripts in Ghana. Customize this file or ask me to convert to a real website with payments and server.</div>
+      </div>
+    </aside>
+  </main>
+
+  <footer>
+    BlueMarket Demo • 30% platform commission • 10% shipping fee • Demo only
+  </footer>
+
+</div>
+
+<!-- ===== Login Modal (simple) ===== -->
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(2,6,23,0.6);z-index:999;align-items:center;justify-content:center">
+  <div style="width:360px;background:#fff;padding:18px;border-radius:12px;box-shadow:0 20px 60px rgba(10,20,40,0.6);">
+    <h3>Sign In</h3>
+    <label>Email or phone</label>
+    <input id="li_user" placeholder="email@example.com or 024xxxxxxx" />
+    <label>Password</label>
+    <input id="li_pass" type="password" placeholder="password" />
+    <div style="display:flex;gap:8px;margin-top:10px;">
+      <button class="btn" onclick="doLogin()">Sign In</button>
+      <button class="btn secondary" onclick="closeLoginModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/*
+  BlueMarket — All-in-one demo
+  - localStorage used to store users, products, session
+  - This is a demo. Replace persist/storage with server when ready.
+*/
+
+// ---------- Utilities ----------
+const qs = (s, ctx=document) => ctx.querySelector(s);
+const qsa = (s, ctx=document) => [...ctx.querySelectorAll(s)];
+const randId = (p='id') => p + '_' + Math.random().toString(36).slice(2,9);
+
+// ---------- App state ----------
+let STATE = {
+  users: JSON.parse(localStorage.getItem('bm_users')||'[]'),
+  products: JSON.parse(localStorage.getItem('bm_products')||'[]'),
+  session: JSON.parse(localStorage.getItem('bm_session')||'null'),
+  settings: JSON.parse(localStorage.getItem('bm_settings')||'{}'),
+  filter: { category: 'All', query: '' }
+};
+
+// ---------- Demo seed data (if empty) ----------
+(function seed(){
+  if(STATE.products.length === 0){
+    const demo = [
+      { id:randId('p'), title:'Wireless Headphones', price:259, category:'Electronics', img:'https://images.unsplash.com/photo-1585386959984-a415522d6f2f?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=4f5c734f6a96b1f1c8c3d6d8b8f48b8b', desc:'Comfortable wireless audio.', seller:'BlueMarket Demo', sellerId:'demo', created:Date.now() - 86400000 },
+      { id:randId('p'), title:'Smart Watch', price:499, category:'Electronics', img:'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=7a8a1d3f1d1f4a1a4b8d7c1d2f3a5a6b', desc:'Track fitness and more.', seller:'BlueMarket Demo', sellerId:'demo', created:Date.now() - 3600000 },
+      { id:randId('p'), title:'Leather Shoes', price:180, category:'Fashion', img:'https://images.unsplash.com/photo-1600180758895-9d1d6b0a1c1a?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=eb8b9d4f1e5f6c7d8a9b0c1d2e3f4a5b', desc:'Formal leather shoes, size 42.', seller:'BlueMarket Demo', sellerId:'demo', created:Date.now() - 7200000 }
+    ];
+    STATE.products = demo;
+    saveState('products');
+  }
+  if(STATE.users.find(u=>u.email==='demo@bluemarket.local')===undefined){
+    STATE.users.push({
+      id: 'demo',
+      name: 'BlueMarket Demo',
+      email: 'demo@bluemarket.local',
+      phone: '',
+      bio: 'Demo seller account.',
+      created: Date.now() - (1000*60*60*24*30),
+      pin: '',
+      password: 'demo123' // demo password
+    });
+    saveState('users');
+  }
+})();
+
+// ---------- Storage helpers ----------
+function saveState(key){
+  if(key==='users') localStorage.setItem('bm_users', JSON.stringify(STATE.users));
+  if(key==='products') localStorage.setItem('bm_products', JSON.stringify(STATE.products));
+  if(key==='session') localStorage.setItem('bm_session', JSON.stringify(STATE.session));
+  if(key==='settings') localStorage.setItem('bm_settings', JSON.stringify(STATE.settings));
+}
+
+// ---------- UI rendering ----------
+function renderAuthArea(){
+  const auth = qs('#authArea');
+  auth.innerHTML = '';
+  if(STATE.session && STATE.session.userId){
+    const user = STATE.users.find(u=>u.id===STATE.session.userId);
+    if(user){
+      auth.innerHTML = `
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="text-align:right">
+            <div style="font-weight:700">${user.name.split(' ')[0]}</div>
+            <div class="small">Member: ${timeSince(user.created)}</div>
+          </div>
+          <button class="btn secondary" onclick="showTab('profile')">Profile</button>
+          <button class="btn" onclick="logout()">Logout</button>
+        </div>
+      `;
+      return;
+    }
+  }
+  auth.innerHTML = `
+    <div style="display:flex;gap:8px">
+      <button class="btn secondary" onclick="showLoginModal()">Sign In</button>
+      <button class="btn" onclick="showTab('create')">Create Account</button>
+    </div>`;
+}
+
+function renderProducts(){
+  const list = qs('#productList');
+  list.innerHTML = '';
+  const filtered = STATE.products.filter(p=>{
+    const q = STATE.filter.query.trim().toLowerCase();
+    const cat = STATE.filter.category;
+    const matchesQ = !q || (p.title+p.desc+p.category+p.seller).toLowerCase().includes(q);
+    const matchesCat = cat==='All' || p.category===cat;
+    return matchesQ && matchesCat;
+  });
+  if(filtered.length===0){
+    list.innerHTML = `<div class="card">No items found. Add the first item in Add Item tab.</div>`;
+    return;
+  }
+  filtered.forEach(p=>{
+    const el = document.createElement('div');
+    el.className='product';
+    el.innerHTML = `
+      <img src="${p.img||'https://via.placeholder.com/800x400?text=No+Image'}" alt="${escapeHtml(p.title)}"/>
+      <div class="body">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-weight:700">${escapeHtml(p.title)}</div>
+            <div class="small">${escapeHtml(p.category)} • Seller: <span class="muted-dark">${escapeHtml(p.seller)}</span></div>
+          </div>
+          <div class="price">GHS ${Number(p.price).toFixed(2)}</div>
+        </div>
+        <div class="small" style="flex:1;margin-top:6px">${escapeHtml(p.desc||'No description')}</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn" onclick="viewProduct('${p.id}')">View</button>
+          <button class="btn secondary" onclick="followSeller('${p.sellerId}')">Follow</button>
+          <button class="btn secondary" onclick="reportItem('${p.id}')">Report</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+}
+
+function renderProfile(){
+  const area = qs('#profileArea');
+  if(!(STATE.session && STATE.session.userId)){
+    area.innerHTML = `<div class="small">You are not signed in. <button class="btn" onclick="showLoginModal()">Sign In</button></div>`;
+    return;
+  }
+  const user = STATE.users.find(u=>u.id===STATE.session.userId);
+  if(!user){ area.innerHTML = `<div class="small">User not found.</div>`; return; }
+  area.innerHTML = `
+    <div style="display:flex;gap:12px;align-items:center">
+      <div style="width:86px;height:86px;border-radius:12px;background:linear-gradient(90deg,var(--yellow),var(--blue));display:grid;place-items:center;color:#fff;font-weight:700">${(user.name||'U').slice(0,2).toUpperCase()}</div>
+      <div>
+        <div style="font-weight:800">${escapeHtml(user.name)}</div>
+        <div class="small">Member since: ${new Date(user.created).toLocaleDateString()}</div>
+        <div class="small">Email: ${escapeHtml(user.email)} ${user.phone?(' • Phone: '+escapeHtml(user.phone)):''}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <h4>About</h4>
+      <div id="bioText">${escapeHtml(user.bio||'No bio yet.')}</div>
+      <textarea id="editBio" rows="3" style="margin-top:8px">${escapeHtml(user.bio||'')}</textarea>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button class="btn" onclick="saveBio()">Save Bio</button>
+        <button class="btn secondary" onclick="deleteAccount()">Delete Account</button>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <h4>Your Items</h4>
+      <div id="userItems" style="display:grid;gap:8px;margin-top:8px"></div>
+    </div>
+  `;
+  renderUserItems(user.id);
+}
+
+function renderUserItems(uid){
+  const cont = qs('#userItems');
+  const items = STATE.products.filter(p=>p.sellerId===uid);
+  if(items.length===0){ cont.innerHTML = `<div class="small">No items yet.</div>`; return; }
+  cont.innerHTML = items.map(p=>`
+    <div style="display:flex;align-items:center;gap:10px;border:1px solid #eef6ff;padding:8px;border-radius:8px">
+      <img src="${p.img||'https://via.placeholder.com/200'}" style="width:64px;height:48px;object-fit:cover;border-radius:6px"/>
+      <div style="flex:1">
+        <div style="font-weight:700">${escapeHtml(p.title)}</div>
+        <div class="small">GHS ${Number(p.price).toFixed(2)} • ${escapeHtml(p.category)}</div>
+      </div>
+      <div>
+        <button class="btn secondary" onclick="editItem('${p.id}')">Edit</button>
+        <button class="btn" onclick="removeItem('${p.id}')">Remove</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ---------- Actions ----------
+function showTab(name){
+  qsa('.view').forEach(v=>v.style.display='none');
+  qs('#'+name).style.display='block';
+  qsa('.tab').forEach(t=>t.classList.remove('active'));
+  qsa(`.tab[data-tab="${name}"]`).forEach(t=>t.classList.add('active'));
+  if(name==='home') renderProducts();
+  if(name==='profile') renderProfile();
+}
+
+function doSignUp(){
+  const name = qs('#su_name').value.trim();
+  const email = qs('#su_email').value.trim().toLowerCase();
+  const phone = qs('#su_phone').value.trim();
+  const id = qs('#su_id').value.trim();
+  const pass = qs('#su_pass').value;
+  const pass2 = qs('#su_pass2').value;
+  const bio = qs('#su_bio').value.trim();
+  if(!name || !email || !pass) return alert('Please fill required fields.');
+  if(pass !== pass2) return alert('Passwords do not match.');
+  if(STATE.users.find(u=>u.email===email)) return alert('An account with this email already exists.');
+  const user = { id: randId('u'), name, email, phone, idNumber: id, password: pass, bio, created: Date.now(), pin:'' };
+  STATE.users.push(user);
+  saveState('users');
+  STATE.session = { userId: user.id };
+  saveState('session');
+  renderAuthArea();
+  showTab('home');
+  alert('Account created. Welcome, ' + user.name.split(' ')[0] + '!');
+}
+
+function showLoginModal(){ qs('#loginModal').style.display='flex'; }
+function closeLoginModal(){ qs('#loginModal').style.display='none'; }
+function doLogin(){
+  const who = qs('#li_user').value.trim().toLowerCase();
+  const pass = qs('#li_pass').value;
+  if(!who || !pass) return alert('Please enter credentials.');
+  const user = STATE.users.find(u=>u.email===who || u.phone===who);
+  if(!user) return alert('User not found.');
+  if(user.password !== pass) return alert('Incorrect password.');
+  STATE.session = { userId: user.id };
+  saveState('session');
+  renderAuthArea();
+  closeLoginModal();
+  showTab('home');
+  alert('Welcome back, ' + user.name.split(' ')[0] + '!');
+}
+
+function logout(){
+  STATE.session = null;
+  saveState('session');
+  renderAuthArea();
+  showTab('home');
+}
+
+function addItem(){
+  if(!(STATE.session && STATE.session.userId)) return alert('You need to sign in to add items.');
+  const title = qs('#item_title').value.trim();
+  const price = qs('#item_price').value;
+  const category = qs('#item_category').value;
+  const desc = qs('#item_desc').value.trim();
+  const file = qs('#item_image').files[0];
+  if(!title || !price) return alert('Please fill required fields.');
+  const newId = randId('p');
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      createProduct(newId, title, price, category, desc, e.target.result);
+    }
+    reader.readAsDataURL(file);
+  } else {
+    createProduct(newId, title, price, category, desc, '');
+  }
+}
+
+function createProduct(id, title, price, category, desc, img){
+  const user = STATE.users.find(u=>u.id===STATE.session.userId);
+  const product = { id, title, price:Number(price), category, desc, img, seller:user.name, sellerId:user.id, created:Date.now() };
+  STATE.products.unshift(product);
+  saveState('products');
+  clearAddItemForm();
+  showTab('home');
+  renderProducts();
+  alert('Item added!');
+}
+
+function clearAddItemForm(){
+  qs('#item_title').value='';qs('#item_price').value='';qs('#item_desc').value='';qs('#item_image').value='';
+}
+
+function viewProduct(id){
+  const p = STATE.products.find(x=>x.id===id);
+  if(!p) return alert('Item not found.');
+  const html = `
+    <div style="padding:12px;">
+      <h3>${escapeHtml(p.title)}</h3>
+      <img src="${p.img||'https://via.placeholder.com/800x400?text=No+Image'}" style="width:100%;max-height:300px;object-fit:cover;border-radius:8px;margin-top:8px"/>
+      <div style="margin-top:8px"><strong>GHS ${Number(p.price).toFixed(2)}</strong></div>
+      <div class="small" style="margin-top:8px">${escapeHtml(p.desc||'')}</div>
+      <div class="small" style="margin-top:8px">Seller: ${escapeHtml(p.seller)}</div>
+      <div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn" onclick="startChat('${p.sellerId}')">Message Seller</button>
+        <button class="btn secondary" onclick="addToCart('${p.id}')">Add to Cart</button>
+      </div>
+    </div>
+  `;
+  const modal = document.createElement('div');
+  modal.style.position='fixed';modal.style.inset='0';modal.style.background='rgba(2,6,23,0.6)';modal.style.display='grid';modal.style.placeItems='center';modal.style.zIndex=9999;
+  modal.innerHTML = `<div style="width:680px;max-width:95%;background:#fff;border-radius:12px;padding:12px;max-height:90vh;overflow:auto">${html}<div style="text-align:right;margin-top:10px"><button class="btn secondary" id="closeProd">Close</button></div></div>`;
+  document.body.appendChild(modal);
+  qs('#closeProd', modal).onclick = ()=>modal.remove();
+}
+
+function followSeller(sellerId){
+  if(!(STATE.session && STATE.session.userId)) return alert('Sign in to follow sellers.');
+  // simple placeholder to show action
+  alert('You are now following this seller (demo).');
+}
+function reportItem(id){
+  alert('Item reported. We will review it. (demo action)');
+}
+function startChat(sellerId){
+  if(!(STATE.session && STATE.session.userId)) return alert('Sign in to message sellers.');
+  alert('Opening chat (demo). Message sending not implemented in demo file.');
+}
+function addToCart(pid){
+  if(!(STATE.session && STATE.session.userId)) return alert('Sign in to add to cart.');
+  // Demo simple cart in localStorage per user
+  const uid = STATE.session.userId;
+  const key = 'bm_cart_'+uid;
+  const cart = JSON.parse(localStorage.getItem(key)||'[]');
+  if(cart.includes(pid)) return alert('Item already in cart.');
+  cart.push(pid);
+  localStorage.setItem(key, JSON.stringify(cart));
+  alert('Added to cart (demo).');
+}
+
+// edit/remove items
+function editItem(id){
+  if(!(STATE.session && STATE.session.userId)) return alert('Sign in first.');
+  const p = STATE.products.find(x=>x.id===id);
+  if(!p) return alert('Item not found.');
+  if(p.sellerId !== STATE.session.userId) return alert('You can only edit your own items in demo.');
+  // Pre-fill add item form
+  showTab('add-item');
+  qs('#item_title').value = p.title;
+  qs('#item_price').value = p.price;
+  qs('#item_category').value = p.category;
+  qs('#item_desc').value = p.desc;
+  // Remove old item on saving new (simple)
+  removeItem(p.id);
+}
+
+function removeItem(id){
+  if(!confirm('Delete this item?')) return;
+  STATE.products = STATE.products.filter(p=>p.id!==id);
+  saveState('products');
+  renderProducts();
+  renderProfile();
+}
+
+// save profile bio
+function saveBio(){
+  const bio = qs('#editBio').value.trim();
+  const user = STATE.users.find(u=>u.id===STATE.session.userId);
+  if(!user) return;
+  user.bio = bio;
+  saveState('users');
+  renderProfile();
+  alert('Bio saved.');
+}
+
+function deleteAccount(){
+  if(!confirm('Delete your account? This cannot be undone in demo.')) return;
+  const uid = STATE.session.userId;
+  STATE.users = STATE.users.filter(u=>u.id!==uid);
+  STATE.products = STATE.products.filter(p=>p.sellerId!==uid);
+  STATE.session = null;
+  saveState('users'); saveState('products'); saveState('session');
+  renderAuthArea(); renderProducts();
+  showTab('home');
+  alert('Account deleted (demo).');
+}
+
+// settings
+function saveSettings(){
+  const pin = qs('#pin').value.trim();
+  const dark = qs('#darkToggle').checked;
+  if(STATE.session && STATE.session.userId){
+    const u = STATE.users.find(x=>x.id===STATE.session.userId);
+    if(u) u.pin = pin;
+    saveState('users');
+  }
+  STATE.settings.dark = dark;
+  saveState('settings');
+  applySettings();
+  alert('Settings saved (demo).');
+}
+function applySettings(){
+  if(STATE.settings.dark) document.body.classList.add('dark'); else document.body.classList.remove('dark');
+  if(qs('#darkToggle')) qs('#darkToggle').checked = !!STATE.settings.dark;
+}
+
+// helpers: search/filter
+function searchItems(){
+  const q = qs('#globalSearch').value||'';
+  STATE.filter.query = q;
+  showTab('home');
+}
+function filterCategory(cat){
+  STATE.filter.category = cat;
+  showTab('home');
+}
+
+// small helpers
+function timeSince(ts){
+  const s = Math.floor((Date.now()-ts)/1000);
+  if(s<60) return s+'s';
+  if(s<3600) return Math.floor(s/60)+'m';
+  if(s<86400) return Math.floor(s/3600)+'h';
+  return Math.floor(s/86400)+'d';
+}
+function escapeHtml(str=''){ return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+// quick small features for demo
+function viewCurrentUser(){ if(STATE.session && STATE.session.userId) showTab('profile'); else showLoginModal(); }
+
+// load initial UI
+renderAuthArea();
+renderProducts();
+applySettings();
+
+// expose some functions to global for onclicks in html
+window.showTab = showTab;
+window.showLoginModal = showLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.doSignUp = doSignUp;
+window.doLogin = doLogin;
+window.logout = logout;
+window.addItem = addItem;
+window.clearAddItemForm = clearAddItemForm;
+window.filterCategory = filterCategory;
+window.searchItems = searchItems;
+window.viewProduct = viewProduct;
+window.followSeller = followSeller;
+window.reportItem = reportItem;
+window.startChat = startChat;
+window.addToCart = addToCart;
+window.editItem = editItem;
+window.removeItem = removeItem;
+window.saveBio = saveBio;
+window.deleteAccount = deleteAccount;
+window.saveSettings = saveSettings;
+window.renderProfile = renderProfile;
+</script>
+</body>
+</html>
